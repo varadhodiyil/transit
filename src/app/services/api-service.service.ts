@@ -11,12 +11,11 @@ export class ApiService {
 }
 
 export class WeatherService extends ApiService {
-  BASE =
-    'https://api.openweathermap.org/data/2.5/weather?appid=456d3fef325001aef7f0e6cb34ee8b31&units=metric';
+  BASE = 'https://api.openweathermap.org/data/2.5/weather?appid=&units=metric';
   getWeather(lat: number, long: number) {
-    return this.httpClient.get(this.BASE, {
-      params: { lat: lat, lon: long },
-    });
+    // return this.httpClient.get(this.BASE, {
+    //   params: { lat: lat, lon: long },
+    // });
 
     return of({
       coord: { lon: -6.3081, lat: 53.3992 },
