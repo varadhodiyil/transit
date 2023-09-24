@@ -1,4 +1,19 @@
 <div class="mx-4">
+  <ion-searchbar
+    [debounce]="100"
+    (ionInput)="searchStop($event)"
+  ></ion-searchbar>
+
+  <ion-list>
+    <ion-item *ngFor="let stop of stops" (click)="selectStop(stop)">
+      <ion-label
+        >{{ stop.stop_name }}
+        <small class="text-xs">
+          {{stop.distance | number :'1.2-2' }} from you
+        </small></ion-label
+      >
+    </ion-item>
+  </ion-list>
   <div class="w-full h-full">
     <div id="Map" style="height: 88vh"></div>
   </div>

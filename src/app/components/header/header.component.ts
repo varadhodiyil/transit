@@ -38,7 +38,7 @@ export class HeaderComponent implements OnInit {
     this.weatherService
       .getWeather(coordinates.latitude, coordinates.longitude)
       .subscribe((d: any) => {
-        this.currentTab = `Weather ${d['main']['feels_like']} C And condition : ${d['weather'][0]['description']} Wind Speed ${d['wind']['speed']} `;
+        this.currentTab = `${d['main']['feels_like']}\xB0 C - ${d['weather'][0]['description']} - ${d['wind']['speed']} km/h `;
       });
   };
 }

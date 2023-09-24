@@ -13575,9 +13575,9 @@ OpenLayers.Layer.XYZ = OpenLayers.Class(OpenLayers.Layer.Grid, {
 OpenLayers.Layer.OSM = OpenLayers.Class(OpenLayers.Layer.XYZ, {
   name: "OpenStreetMap",
   url: [
-    "http://a.tile.openstreetmap.org/${z}/${x}/${y}.png",
-    "http://b.tile.openstreetmap.org/${z}/${x}/${y}.png",
-    "http://c.tile.openstreetmap.org/${z}/${x}/${y}.png",
+    "https://a.tile.openstreetmap.org/${z}/${x}/${y}.png",
+    "https://b.tile.openstreetmap.org/${z}/${x}/${y}.png",
+    "https://c.tile.openstreetmap.org/${z}/${x}/${y}.png",
   ],
   attribution:
     "&copy; <a href='http://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors",
