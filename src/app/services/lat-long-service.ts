@@ -21,11 +21,7 @@ export class LatLongService {
   getLatLong() {
     return this.$data.asObservable().pipe(
       skipWhile((e) => {
-        console.log(e);
-        if (e) {
-          return false;
-        }
-        return true;
+        return Object.keys(e).length === 0;
       })
     );
   }

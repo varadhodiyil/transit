@@ -34,7 +34,7 @@ export class Tab1Page implements OnInit, OnDestroy {
       }
       this.currentLocation = d;
 
-      const map = new OpenLayers.Map('Map', { numZoomLevels: -1 });
+      const map = new OpenLayers.Map('Map', { numZoomLevels: -1, zoom: 14 });
       map.addLayer(new OpenLayers.Layer.OSM());
       this.map = map;
 
@@ -47,13 +47,13 @@ export class Tab1Page implements OnInit, OnDestroy {
 
       this.markers = markers;
 
-      this.interval = setInterval(() => {
-        if (!this.currentLocation) {
-          clearInterval(this.interval);
-          return;
-        }
-        this.addBuses(this.currentLocation);
-      }, 20000);
+      // this.interval = setInterval(() => {
+      //   if (!this.currentLocation) {
+      //     clearInterval(this.interval);
+      //     return;
+      //   }
+      //   this.addBuses(this.currentLocation);
+      // }, 20000);
       const addStops = (latlng: LatLong) => {
         this.latLongService.nearest(latlng, 1).then((e: BusStop[]) => {
           const iconSize = new OpenLayers.Size(25, 30);
@@ -93,9 +93,10 @@ export class Tab1Page implements OnInit, OnDestroy {
         });
       };
       // addStops(d);
-      this.addBuses(d);
+
       map.addLayer(markers);
-      map.setCenter(lonLat, 15);
+      map.setCenter(lonLat, 14);
+      this.addBuses(d);
     });
 
     // map.zoomToMaxExtent();
@@ -117,47 +118,51 @@ export class Tab1Page implements OnInit, OnDestroy {
       return;
     }
 
-    const min: LatLong = {
-      lat: latlng.lat - 0.03,
-      lng: latlng.lng > 0 ? latlng.lng - 0.04 : latlng.lng + 0.04,
-    };
-
     this.markers.clearMarkers();
     const busicon = new OpenLayers.Icon(
       '/assets/js/img/dublin-bus.png',
       this.iconSize,
       this.iconOffset
     );
-    this.busService.getBusTimes(latlng, min).subscribe((buses: any) => {
-      buses.forEach((bus: any) => {
-        if (!bus.coordinates) {
-          return;
-        }
-        const lonLat = new OpenLayers.LonLat(
-          bus.coordinates[0],
-          bus.coordinates[1]
-        ).transform(this.fromProjection, this.toProjection);
-        const marker = new OpenLayers.Marker(lonLat, busicon.clone());
-        const clickEvent = (evt: any) => {
-          console.log(evt);
-          const popup = new OpenLayers.Popup(
-            'bus_marker',
-            lonLat,
-            new OpenLayers.Size(100, 50),
-            `Bus ${bus['service']['line_name']} Towards ${bus['destination']}`,
-            true
-          );
-          this.map.addPopup(popup);
-        };
-        marker.events.register('touchend', marker, clickEvent);
-        marker.events.register('click', marker, clickEvent);
 
-        this.markers.addMarker(marker);
+    const bounds = this.map
+      .getExtent()
+      .transform(this.toProjection, this.fromProjection);
+    this.busService
+      .getBusTimes(
+        { lat: bounds.bottom, lng: bounds.left },
+        { lat: bounds.top, lng: bounds.right }
+      )
+      .subscribe((buses: any) => {
+        buses.forEach((bus: any) => {
+          if (!bus.coordinates) {
+            return;
+          }
+          const lonLat = new OpenLayers.LonLat(
+            bus.coordinates[0],
+            bus.coordinates[1]
+          ).transform(this.fromProjection, this.toProjection);
+          const marker = new OpenLayers.Marker(lonLat, busicon.clone());
+          const clickEvent = (evt: any) => {
+            console.log(evt);
+            const popup = new OpenLayers.Popup(
+              'bus_marker',
+              lonLat,
+              new OpenLayers.Size(100, 50),
+              `Bus ${bus['service']['line_name']} Towards ${bus['destination']}`,
+              true
+            );
+            this.map.addPopup(popup);
+          };
+          marker.events.register('touchend', marker, clickEvent);
+          marker.events.register('click', marker, clickEvent);
+
+          this.markers.addMarker(marker);
+        });
+        this.addMe(latlng);
+        this.map.setCenter(this.toLongLat(latlng), 14);
+        console.log(this.map.markers);
       });
-      this.addMe(latlng);
-      this.map.setCenter(this.toLongLat(latlng), 17);
-      console.log(this.map.markers);
-    });
   }
   ngOnDestroy(): void {
     if (this.interval) {
