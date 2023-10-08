@@ -5,6 +5,7 @@ import {
   LatLong,
   LatLongService,
 } from '../../services/lat-long-service';
+import { formatNumber } from '@angular/common';
 
 declare const OpenLayers: any;
 @Component({
@@ -19,7 +20,7 @@ export class Tab1Page implements OnInit, OnDestroy {
   currentLocation: LatLong | undefined;
   map: any = undefined;
   markers: any = undefined;
-  iconSize = new OpenLayers.Size(45, 50);
+  iconSize = new OpenLayers.Size(28, 28);
 
   iconOffset = new OpenLayers.Pixel(-(this.iconSize.w / 2), -this.iconSize.h);
   constructor(
@@ -47,13 +48,13 @@ export class Tab1Page implements OnInit, OnDestroy {
 
       this.markers = markers;
 
-      // this.interval = setInterval(() => {
-      //   if (!this.currentLocation) {
-      //     clearInterval(this.interval);
-      //     return;
-      //   }
-      //   this.addBuses(this.currentLocation);
-      // }, 20000);
+      this.interval = setInterval(() => {
+        if (!this.currentLocation) {
+          clearInterval(this.interval);
+          return;
+        }
+        this.addBuses(this.currentLocation);
+      }, 20000);
       const addStops = (latlng: LatLong) => {
         this.latLongService.nearest(latlng, 1).then((e: BusStop[]) => {
           const iconSize = new OpenLayers.Size(25, 30);
@@ -74,7 +75,6 @@ export class Tab1Page implements OnInit, OnDestroy {
               stop.stop_lat
             ).transform(this.fromProjection, this.toProjection);
             const clickEvent = (evt: any) => {
-              console.log(evt);
               const popup = new OpenLayers.Popup(
                 'bus_marker',
                 lonLat,
@@ -97,6 +97,9 @@ export class Tab1Page implements OnInit, OnDestroy {
       map.addLayer(markers);
       map.setCenter(lonLat, 14);
       this.addBuses(d);
+      map.events.register('moveend', map, (evt: any) => {
+        this.addBuses(d);
+      });
     });
 
     // map.zoomToMaxExtent();
@@ -128,6 +131,7 @@ export class Tab1Page implements OnInit, OnDestroy {
     const bounds = this.map
       .getExtent()
       .transform(this.toProjection, this.fromProjection);
+
     this.busService
       .getBusTimes(
         { lat: bounds.bottom, lng: bounds.left },
@@ -142,14 +146,29 @@ export class Tab1Page implements OnInit, OnDestroy {
             bus.coordinates[0],
             bus.coordinates[1]
           ).transform(this.fromProjection, this.toProjection);
+
+          let fromMe: string = '';
+          if (this.currentLocation) {
+            fromMe = `<strong>${formatNumber(
+              this.latLongService.calcDist(this.currentLocation, {
+                lat: bus.coordinates[1],
+                lng: bus.coordinates[0],
+              }),
+              'en-ie',
+              '0.1-2'
+            )}</strong> kms from you`;
+          }
           const marker = new OpenLayers.Marker(lonLat, busicon.clone());
           const clickEvent = (evt: any) => {
-            console.log(evt);
+            this.map.popups.forEach((popup: any) => {
+              popup.destroy();
+            });
             const popup = new OpenLayers.Popup(
               'bus_marker',
               lonLat,
               new OpenLayers.Size(100, 50),
-              `Bus ${bus['service']['line_name']} Towards ${bus['destination']}`,
+              `Bus ${bus['service']['line_name']} Towards ${bus['destination']}
+              <br>${fromMe}`,
               true
             );
             this.map.addPopup(popup);
@@ -160,8 +179,7 @@ export class Tab1Page implements OnInit, OnDestroy {
           this.markers.addMarker(marker);
         });
         this.addMe(latlng);
-        this.map.setCenter(this.toLongLat(latlng), 14);
-        console.log(this.map.markers);
+        // this.map.setCenter(this.toLongLat(latlng), 14);
       });
   }
   ngOnDestroy(): void {

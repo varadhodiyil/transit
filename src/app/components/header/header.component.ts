@@ -30,7 +30,6 @@ export class HeaderComponent implements OnInit {
       return d.coords;
     });
 
-    console.log('Current position:', coordinates);
     this.latLongService.setLatLong({
       lat: coordinates.latitude,
       lng: coordinates.longitude,
