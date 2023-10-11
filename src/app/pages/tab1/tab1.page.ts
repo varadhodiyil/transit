@@ -53,7 +53,7 @@ export class Tab1Page implements OnInit, OnDestroy {
           clearInterval(this.interval);
           return;
         }
-        this.addBuses(this.currentLocation);
+        this.addBuses();
       }, 20000);
       const addStops = (latlng: LatLong) => {
         this.latLongService.nearest(latlng, 1).then((e: BusStop[]) => {
@@ -96,10 +96,11 @@ export class Tab1Page implements OnInit, OnDestroy {
 
       map.addLayer(markers);
       map.setCenter(lonLat, 14);
-      this.addBuses(d);
+
       map.events.register('moveend', map, (evt: any) => {
-        this.addBuses(d);
+        this.addBuses();
       });
+      this.map.setCenter(this.toLongLat(d), 14);
     });
 
     // map.zoomToMaxExtent();
@@ -113,7 +114,7 @@ export class Tab1Page implements OnInit, OnDestroy {
     const markerMe = new OpenLayers.Marker(this.toLongLat(latlng), me.clone());
     this.markers.addMarker(markerMe);
   }
-  addBuses(latlng: LatLong) {
+  addBuses() {
     if (!this.markers) {
       return;
     }
@@ -178,7 +179,9 @@ export class Tab1Page implements OnInit, OnDestroy {
 
           this.markers.addMarker(marker);
         });
-        this.addMe(latlng);
+        if (this.currentLocation) {
+          this.addMe(this.currentLocation);
+        }
         // this.map.setCenter(this.toLongLat(latlng), 14);
       });
   }
@@ -199,14 +202,19 @@ export class Tab1Page implements OnInit, OnDestroy {
     if (!this.currentLocation) {
       return;
     }
-    const query = event.target.value.toLowerCase();
-    if (query && query.length > 2) {
-      this.stops = this.latLongService.getStops(this.currentLocation, query);
+    if (!event) {
+      this.stops = [];
     }
+    const query = event.target.value.toLowerCase();
+
+    this.stops = this.latLongService.getStops(this.currentLocation, query);
+  }
+  setCenter(latLng: LatLong) {
+    this.map.setCenter(this.toLongLat(latLng), 14);
   }
   selectStop(stop: BusStop) {
     this.currentLocation = { lat: stop.stop_lat, lng: stop.stop_lon };
-    this.addBuses(this.currentLocation);
+    this.setCenter(this.currentLocation);
     this.stops = [];
   }
 }

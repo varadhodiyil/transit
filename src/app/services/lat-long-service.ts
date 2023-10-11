@@ -58,8 +58,10 @@ export class LatLongService {
     });
   }
   getStops(currentLocation: LatLong, q: string) {
-    return Stops.filter((e: BusStop) =>
-      e.stop_name.toLowerCase().includes(q.toLowerCase())
+    return Stops.filter(
+      (e: BusStop) =>
+        e.stop_name.toLowerCase().includes(q.toLowerCase()) ||
+        (parseInt(q) && e.stop_code === parseInt(q))
     )
       .map((e: BusStop) => {
         e.distance = this.calcDist(currentLocation, {
