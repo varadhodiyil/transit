@@ -12,26 +12,20 @@ import {
   BusTimesService,
   WeatherService,
 } from './services/api-service.service';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HeaderService } from './services/header.service';
 import { LatLongService } from './services/lat-long-service';
-@NgModule({
-  declarations: [AppComponent],
-  imports: [
-    BrowserModule,
-    IonicModule.forRoot(),
-    AppRoutingModule,
-    PartialsModule,
-    HttpClientModule,
-  ],
-  providers: [
-    { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    ApiService,
-    WeatherService,
-    HeaderService,
-    LatLongService,
-    BusTimesService,
-  ],
-  bootstrap: [AppComponent],
-})
+@NgModule({ declarations: [AppComponent],
+    bootstrap: [AppComponent], imports: [BrowserModule,
+        IonicModule.forRoot(),
+        AppRoutingModule,
+        PartialsModule], providers: [
+        { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+        ApiService,
+        WeatherService,
+        HeaderService,
+        LatLongService,
+        BusTimesService,
+        provideHttpClient(withInterceptorsFromDi()),
+    ] })
 export class AppModule {}
