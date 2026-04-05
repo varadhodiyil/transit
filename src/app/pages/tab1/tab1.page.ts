@@ -9,9 +9,10 @@ import { formatNumber } from '@angular/common';
 
 declare const OpenLayers: any;
 @Component({
-  selector: 'app-tab1',
-  templateUrl: 'tab1.page.html',
-  styleUrls: ['tab1.page.scss'],
+    selector: 'app-tab1',
+    templateUrl: 'tab1.page.html',
+    styleUrls: ['tab1.page.scss'],
+    standalone: false
 })
 export class Tab1Page implements OnInit, OnDestroy {
   fromProjection = new OpenLayers.Projection('EPSG:4326'); // transform from WGS 1984

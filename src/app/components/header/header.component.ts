@@ -4,9 +4,10 @@ import { WeatherService } from 'src/app/services/api-service.service';
 import { HeaderService } from 'src/app/services/header.service';
 import { LatLongService } from 'src/app/services/lat-long-service';
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.scss'],
+    selector: 'app-header',
+    templateUrl: './header.component.html',
+    styleUrls: ['./header.component.scss'],
+    standalone: false
 })
 export class HeaderComponent implements OnInit {
   currentTab = '';
