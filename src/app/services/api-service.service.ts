@@ -10,6 +10,7 @@ export class ApiService {
   constructor(protected httpClient: HttpClient) {}
 }
 
+@Injectable()
 export class WeatherService extends ApiService {
   BASE =
     'https://api.openweathermap.org/data/2.5/weather?appid=456d3fef325001aef7f0e6cb34ee8b31&units=metric';
@@ -49,6 +50,7 @@ export class WeatherService extends ApiService {
   }
 }
 
+@Injectable()
 export class BusTimesService extends ApiService {
   getBusTimes(max: LatLong, min: LatLong) {
     return this.httpClient.get('https://bustimes.org/vehicles.json', {
